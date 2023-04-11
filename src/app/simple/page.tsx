@@ -3,7 +3,7 @@
 import LoadingSpinner from "@/components/loadingSpinner";
 import ResultsList from "@/components/resultsList";
 import SearchBar from "@/components/searchbar";
-import { VehicleRecall } from "@/types";
+import { Query, VehicleRecall } from "@/types";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
 
@@ -11,21 +11,28 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function SimpleSearch() {
   const objectType = "VehicleRecall";
-  const [query, setQuery] = useState<string>("");
+  const pageSize = 10;
+  const [queryTerm, setQueryTermTerm] = useState<string>("");
   const [results, setResults] = useState<VehicleRecall[] | undefined>();
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
-  function handleReset() {
-    setResults(undefined);
-    setNextPageToken(undefined);
-  }
+  const query: Query = {
+    type: "allTerms",
+    field: "properties.subject",
+    value: queryTerm,
+  };
 
   function handleSearch() {
-    if (query !== "") {
+    if (queryTerm !== "") {
       setIsSearching(true);
-      handleReset();
-      fetch(`/api/single?objectType=${objectType}&query=${query}`)
+      setResults(undefined);
+      setNextPageToken(undefined);
+      fetch(`/api/search?objectType=${objectType}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query, pageSize }),
+      })
         .then((resp) => resp.json())
         .then((respJson) => {
           setResults(respJson["data"]);
@@ -37,11 +44,11 @@ export default function SimpleSearch() {
 
   function handleLoadMore() {
     setIsSearching(true);
-    fetch(
-      `/api/single?objectType=${objectType}&query=${query}${
-        nextPageToken ? "&nextPageToken=" + nextPageToken : ""
-      }`
-    )
+    fetch(`/api/search?objectType=${objectType}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, pageSize, pageToken: nextPageToken }),
+    })
       .then((resp) => resp.json())
       .then((respJson) => {
         setResults(results?.concat(respJson["data"]));
@@ -51,10 +58,11 @@ export default function SimpleSearch() {
   }
 
   useEffect(() => {
-    if (query === "") {
-      handleReset();
+    if (queryTerm === "") {
+      setResults(undefined);
+      setNextPageToken(undefined);
     }
-  }, [query]);
+  }, [queryTerm]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start gap-12 p-24">
@@ -63,16 +71,21 @@ export default function SimpleSearch() {
           Search Demo
         </h2>
       </a>
+      <div className="prose">
+        <p className="w-full p-4 md:w-9/12 lg:w-[500px]">
+          Search the subject property of all
+          <span className="font-semibold text-cyan-700"> objectType </span>{" "}
+          objects
+        </p>
+      </div>
       <SearchBar
-        objectType={objectType}
-        query={query}
+        query={queryTerm}
         handleSearch={handleSearch}
-        setQuery={setQuery}
+        setQueryTerm={setQueryTermTerm}
         isSearching={isSearching}
-        labelText={`Search the subject property of all ${objectType} objects`}
       />
       <ResultsList results={results} />
-      {nextPageToken && (
+      {(nextPageToken || isSearching) && (
         <button
           className="w-30 flex justify-center rounded-md border border-transparent bg-cyan-100 px-4 py-2 text-center text-sm font-medium text-cyan-800 shadow-sm hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
           onClick={handleLoadMore}

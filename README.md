@@ -12,6 +12,9 @@
   - Add results to page
   - Add Pagination (and page limit)
 - Pagination walkthru
+- Multi obj type
+  - handling keys in typescript of diff obj types
+  - can't programmatically refer to the id or title of a given object type (so must add that manually to the type def)
 
 # Search Demo
 
