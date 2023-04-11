@@ -1,5 +1,23 @@
+# To do
+- Make UI components
+- Start work on typeahead searching
+- Move simple to its own page
+
+# Notes from simple
+- Break down steps
+  - Searchbar
+  - URL params
+  - Craft request body
+  - Figure out shape of responses (use type generator script)
+  - Add results to page
+  - Add Pagination (and page limit)
+- Pagination walkthru
+
+
 # Search Demo
+
 This project demonstrates how to let users search object types in Foundry's ontology from a third-party app that uses Foundry's APIs. There are three examples:
+
 - Letting a user run a search by entering text and clicking a button (`/simple`)
 - Letting a user run a serach by just entering text (`/typeahead`)
 - Searching multiple object types at once (`/multiple`)
@@ -7,9 +25,11 @@ This project demonstrates how to let users search object types in Foundry's onto
 You can read this blog post about [how to build a search feature using Foundry's APIs](https://example.com) for more details.
 
 ## Getting Started
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 First, create an environment file `.env.local` to store your [Foundry auth token](https://www.palantir.com/docs/foundry/api/general/overview/authentication/#authentication-during-development), the ontology rid (see the Advanced pane in the Ontology Manager app in Foundry), and your Foundry stack's hostname:
+
 ```
 # .env.local
 TOKEN=<your foundry token>
