@@ -55,20 +55,6 @@ export default function Home() {
             </p>
           </a>
         </li>
-        <li>
-          <a
-            href="/multi-type"
-            className="block rounded-md border border-cyan-500 p-4 hover:border-cyan-600 hover:bg-cyan-50"
-          >
-            <h3 className={`${inter.className} text-xl font-semibold`}>
-              Live Search: Multiple Object Types
-            </h3>
-            <p>
-              Search multiple properties of multiple object types as the user
-              types a query.
-            </p>
-          </a>
-        </li>
       </ul>
     </main>
   );
