@@ -1,9 +1,9 @@
 # To do
-- Make UI components
+
 - Start work on typeahead searching
-- Move simple to its own page
 
 # Notes from simple
+
 - Break down steps
   - Searchbar
   - URL params
@@ -12,7 +12,6 @@
   - Add results to page
   - Add Pagination (and page limit)
 - Pagination walkthru
-
 
 # Search Demo
 
