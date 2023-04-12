@@ -5,7 +5,7 @@ import ResultsList from "@/components/resultsList";
 import SearchBar from "@/components/searchbar";
 import { Query, VehicleRecall } from "@/types";
 import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,81 +17,61 @@ export default function SimpleSearchMultiProp() {
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
-  /**
-   * All the code in this fileis the same as /simple/page.tsx
-   * except for the query. Here we have a more involved query
-   * that searches multiple fields.
-   */
-  const query: Query = {
-    type: "or",
-    value: [
-      { type: "allTerms", field: "properties.subject", value: queryTerm },
-      { type: "anyTerm", field: "properties.component", value: queryTerm },
-      {
-        type: "allTerms",
-        field: "properties.consequenceSummary",
-        value: queryTerm,
-      },
-      {
-        type: "allTerms",
-        field: "properties.correctiveAction",
-        value: queryTerm,
-      },
-      {
-        type: "eq",
-        field: "properties.recallType",
-        value: queryTerm
-          .split(" ")
-          .map(
-            (s) =>
-              s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase()
-          )
-          .join(" "),
-      },
-      {
-        type: "eq",
-        field: "properties.nhtsaId",
-        value: queryTerm,
-      },
-      {
-        type: "and",
-        value: [
-          {
-            type: "anyTerm",
-            field: "properties.recallDescription",
-            value: queryTerm,
-          },
-          {
-            type: "anyTerm",
-            field: "properties.manufacturer",
-            value: queryTerm,
-          },
-        ],
-      },
-    ],
-  };
+  const fetchResults = useCallback(() => {
+    /**
+     * All the code in this fileis the same as /simple/page.tsx
+     * except for the query. Here we have a more involved query
+     * that searches multiple fields.
+     */
+    const query: Query = {
+      type: "or",
+      value: [
+        { type: "allTerms", field: "properties.subject", value: queryTerm },
+        { type: "anyTerm", field: "properties.component", value: queryTerm },
+        {
+          type: "allTerms",
+          field: "properties.consequenceSummary",
+          value: queryTerm,
+        },
+        {
+          type: "allTerms",
+          field: "properties.correctiveAction",
+          value: queryTerm,
+        },
+        {
+          type: "eq",
+          field: "properties.recallType",
+          value: queryTerm
+            .split(" ")
+            .map(
+              (s) =>
+                s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase()
+            )
+            .join(" "),
+        },
+        {
+          type: "eq",
+          field: "properties.nhtsaId",
+          value: queryTerm,
+        },
+        {
+          type: "and",
+          value: [
+            {
+              type: "anyTerm",
+              field: "properties.recallDescription",
+              value: queryTerm,
+            },
+            {
+              type: "anyTerm",
+              field: "properties.manufacturer",
+              value: queryTerm,
+            },
+          ],
+        },
+      ],
+    };
 
-  function handleSearch() {
-    if (queryTerm !== "") {
-      setIsSearching(true);
-      setResults(undefined);
-      setNextPageToken(undefined);
-      fetch(`/api/search?objectType=${objectType}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, pageSize }),
-      })
-        .then((resp) => resp.json())
-        .then((respJson) => {
-          setResults(respJson["data"]);
-          setNextPageToken(respJson["nextPageToken"]);
-          setIsSearching(false);
-        });
-    }
-  }
-
-  function handleLoadMore() {
-    setIsSearching(true);
     fetch(`/api/search?objectType=${objectType}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -99,10 +79,19 @@ export default function SimpleSearchMultiProp() {
     })
       .then((resp) => resp.json())
       .then((respJson) => {
-        setResults(results?.concat(respJson["data"]));
+        setResults(respJson["data"]);
         setNextPageToken(respJson["nextPageToken"]);
         setIsSearching(false);
       });
+  }, [queryTerm, nextPageToken]);
+
+  function handleSearch() {
+    if (queryTerm !== "") {
+      setIsSearching(true);
+      setResults(undefined);
+      setNextPageToken(undefined);
+      fetchResults();
+    }
   }
 
   useEffect(() => {
@@ -140,7 +129,10 @@ export default function SimpleSearchMultiProp() {
       {(nextPageToken || isSearching) && (
         <button
           className="w-30 flex justify-center rounded-md border border-transparent bg-cyan-100 px-4 py-2 text-center text-sm font-medium text-cyan-800 shadow-sm hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-          onClick={handleLoadMore}
+          onClick={() => {
+            setIsSearching(true);
+            fetchResults();
+          }}
         >
           {isSearching ? <LoadingSpinner colorVariant="cyan" /> : "Load More"}
         </button>

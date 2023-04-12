@@ -5,7 +5,7 @@ import ResultsList from "@/components/resultsList";
 import SearchBar from "@/components/searchbar";
 import { Query, VehicleRecall } from "@/types";
 import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,33 +17,13 @@ export default function SimpleSearch() {
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
-  const query: Query = {
-    type: "allTerms",
-    field: "properties.subject",
-    value: queryTerm,
-  };
+  const fetchResults = useCallback(() => {
+    const query: Query = {
+      type: "allTerms",
+      field: "properties.subject",
+      value: queryTerm,
+    };
 
-  function handleSearch() {
-    if (queryTerm !== "") {
-      setIsSearching(true);
-      setResults(undefined);
-      setNextPageToken(undefined);
-      fetch(`/api/search?objectType=${objectType}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, pageSize }),
-      })
-        .then((resp) => resp.json())
-        .then((respJson) => {
-          setResults(respJson["data"]);
-          setNextPageToken(respJson["nextPageToken"]);
-          setIsSearching(false);
-        });
-    }
-  }
-
-  function handleLoadMore() {
-    setIsSearching(true);
     fetch(`/api/search?objectType=${objectType}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,10 +31,19 @@ export default function SimpleSearch() {
     })
       .then((resp) => resp.json())
       .then((respJson) => {
-        setResults(results?.concat(respJson["data"]));
+        setResults(respJson["data"]);
         setNextPageToken(respJson["nextPageToken"]);
         setIsSearching(false);
       });
+  }, [queryTerm, nextPageToken]);
+
+  function handleSearch() {
+    if (queryTerm !== "") {
+      setIsSearching(true);
+      setResults(undefined);
+      setNextPageToken(undefined);
+      fetchResults();
+    }
   }
 
   useEffect(() => {
@@ -88,7 +77,10 @@ export default function SimpleSearch() {
       {(nextPageToken || isSearching) && (
         <button
           className="w-30 flex justify-center rounded-md border border-transparent bg-cyan-100 px-4 py-2 text-center text-sm font-medium text-cyan-800 shadow-sm hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-          onClick={handleLoadMore}
+          onClick={() => {
+            setIsSearching(true);
+            fetchResults();
+          }}
         >
           {isSearching ? <LoadingSpinner colorVariant="cyan" /> : "Load More"}
         </button>

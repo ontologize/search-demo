@@ -5,7 +5,7 @@ import ResultsList from "@/components/resultsList";
 import SearchBar from "@/components/searchbar";
 import { Query, VehicleRecall } from "@/types";
 import { Inter } from "next/font/google";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,8 +17,8 @@ export default function LiveSearchMultiProp() {
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
-  const query: Query = useMemo(
-    () => ({
+  const fetchResults = useCallback(() => {
+    const query: Query = {
       type: "or",
       value: [
         { type: "allTerms", field: "properties.subject", value: queryTerm },
@@ -65,12 +65,8 @@ export default function LiveSearchMultiProp() {
           ],
         },
       ],
-    }),
-    [queryTerm]
-  );
+    };
 
-  function handleLoadMore() {
-    setIsSearching(true);
     fetch(`/api/search?objectType=${objectType}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,40 +74,26 @@ export default function LiveSearchMultiProp() {
     })
       .then((resp) => resp.json())
       .then((respJson) => {
-        setResults(results?.concat(respJson["data"]));
+        setResults(respJson["data"]);
         setNextPageToken(respJson["nextPageToken"]);
         setIsSearching(false);
       });
-  }
+  }, [queryTerm, nextPageToken]);
 
   useEffect(() => {
     if (queryTerm === "") {
       setResults(undefined);
       setNextPageToken(undefined);
-    }
-  }, [queryTerm]);
-
-  useEffect(() => {
-    if (queryTerm !== "") {
+    } else {
       const handler = setTimeout(() => {
         setIsSearching(true);
         setResults(undefined);
         setNextPageToken(undefined);
-        fetch(`/api/search?objectType=${objectType}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, pageSize }),
-        })
-          .then((resp) => resp.json())
-          .then((respJson) => {
-            setResults(respJson["data"]);
-            setNextPageToken(respJson["nextPageToken"]);
-            setIsSearching(false);
-          });
+        fetchResults();
       }, 400);
       return () => clearTimeout(handler);
     }
-  }, [queryTerm, query]);
+  }, [queryTerm, fetchResults]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start gap-12 p-24">
@@ -141,7 +123,10 @@ export default function LiveSearchMultiProp() {
       {(nextPageToken || isSearching) && (
         <button
           className="w-30 flex justify-center rounded-md border border-transparent bg-cyan-100 px-4 py-2 text-center text-sm font-medium text-cyan-800 shadow-sm hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-          onClick={handleLoadMore}
+          onClick={() => {
+            setIsSearching(true);
+            fetchResults();
+          }}
         >
           {isSearching ? <LoadingSpinner colorVariant="cyan" /> : "Load More"}
         </button>
