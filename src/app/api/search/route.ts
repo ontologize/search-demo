@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const objectType = new URL(request.url).searchParams.get("objectType");
   if (objectType) {
     const url = `https://${process.env.NEXT_PUBLIC_HOSTNAME}/api/v1/ontologies/${process.env.ONTOLOGYRID}/objects/${objectType}/search/`;
-    await fetch(url, {
+    return await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,6 +14,6 @@ export async function POST(request: Request) {
       body: JSON.stringify(body),
     })
       .then((resp) => resp.json())
-      .then((respJson) => NextResponse.json(respJson.data));
+      .then((respJson) => NextResponse.json(respJson));
   }
 }

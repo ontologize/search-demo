@@ -13,7 +13,7 @@ export default function SimpleSearchMultiProp() {
   const objectType = "VehicleRecall";
   const pageSize = 10;
   const [queryTerm, setQueryTermTerm] = useState<string>("");
-  const [results, setResults] = useState<VehicleRecall[] | undefined>();
+  const [results, setResults] = useState<VehicleRecall[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
@@ -79,16 +79,16 @@ export default function SimpleSearchMultiProp() {
     })
       .then((resp) => resp.json())
       .then((respJson) => {
-        setResults(respJson["data"]);
+        setResults([...results, ...respJson["data"]]);
         setNextPageToken(respJson["nextPageToken"]);
         setIsSearching(false);
       });
-  }, [queryTerm, nextPageToken]);
+  }, [queryTerm, nextPageToken, results]);
 
   function handleSearch() {
     if (queryTerm !== "") {
       setIsSearching(true);
-      setResults(undefined);
+      setResults([]);
       setNextPageToken(undefined);
       fetchResults();
     }
@@ -96,7 +96,7 @@ export default function SimpleSearchMultiProp() {
 
   useEffect(() => {
     if (queryTerm === "") {
-      setResults(undefined);
+      setResults([]);
       setNextPageToken(undefined);
     }
   }, [queryTerm]);

@@ -13,11 +13,11 @@ export default function SimpleSearch() {
   const objectType = "VehicleRecall";
   const pageSize = 10;
   const [queryTerm, setQueryTermTerm] = useState<string>("");
-  const [results, setResults] = useState<VehicleRecall[] | undefined>();
+  const [results, setResults] = useState<VehicleRecall[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
 
-  const fetchResults = useCallback(() => {
+  const fetchResults = useCallback(async () => {
     const query: Query = {
       type: "allTerms",
       field: "properties.subject",
@@ -31,16 +31,16 @@ export default function SimpleSearch() {
     })
       .then((resp) => resp.json())
       .then((respJson) => {
-        setResults(respJson["data"]);
+        setResults([...results, ...respJson["data"]]);
         setNextPageToken(respJson["nextPageToken"]);
         setIsSearching(false);
       });
-  }, [queryTerm, nextPageToken]);
+  }, [queryTerm, nextPageToken, results]);
 
   function handleSearch() {
     if (queryTerm !== "") {
       setIsSearching(true);
-      setResults(undefined);
+      setResults([]);
       setNextPageToken(undefined);
       fetchResults();
     }
@@ -48,7 +48,7 @@ export default function SimpleSearch() {
 
   useEffect(() => {
     if (queryTerm === "") {
-      setResults(undefined);
+      setResults([]);
       setNextPageToken(undefined);
     }
   }, [queryTerm]);
