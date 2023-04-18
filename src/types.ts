@@ -1,7 +1,7 @@
 interface OntologyObject {
   rid: string;
   properties?: {
-    [key: string]: any;
+    [key: string]: string | number | Date | boolean;
   };
 }
 

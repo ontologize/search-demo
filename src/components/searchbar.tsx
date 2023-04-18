@@ -1,7 +1,7 @@
 import LoadingSpinner from "./loadingSpinner";
 
 interface SearchbarProps {
-  query: string;
+  queryTerm: string;
   isSearching: boolean;
   handleSearch?: () => void;
   setQueryTerm: (query: string) => void;
@@ -9,7 +9,7 @@ interface SearchbarProps {
 }
 
 export default function SearchBar({
-  query,
+  queryTerm,
   isSearching,
   handleSearch,
   setQueryTerm,
@@ -23,7 +23,7 @@ export default function SearchBar({
           placeholder="Search..."
           type="search"
           id="search"
-          value={query}
+          value={queryTerm}
           onChange={(e) => setQueryTerm(e.target.value)}
           className="grow rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
         />

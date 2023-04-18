@@ -127,7 +127,7 @@ export default function LiveSearchMultiProp() {
         </p>
       </div>
       <SearchBar
-        query={queryTerm}
+        queryTerm={queryTerm}
         setQueryTerm={setQueryTermTerm}
         isSearching={isSearching}
         displaySearchButton={false}

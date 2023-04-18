@@ -63,12 +63,15 @@ export default function SimpleSearch() {
       <div className="prose">
         <p className="w-full p-4 md:w-9/12 lg:w-[500px]">
           Search the subject property of all
-          <span className="font-semibold text-cyan-700"> objectType </span>{" "}
+          <span className="font-semibold text-cyan-700">
+            {" "}
+            {objectType}{" "}
+          </span>{" "}
           objects
         </p>
       </div>
       <SearchBar
-        query={queryTerm}
+        queryTerm={queryTerm}
         handleSearch={handleSearch}
         setQueryTerm={setQueryTermTerm}
         isSearching={isSearching}

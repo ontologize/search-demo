@@ -120,7 +120,7 @@ export default function SimpleSearchMultiProp() {
         </p>
       </div>
       <SearchBar
-        query={queryTerm}
+        queryTerm={queryTerm}
         handleSearch={handleSearch}
         setQueryTerm={setQueryTermTerm}
         isSearching={isSearching}
