@@ -1,21 +1,3 @@
-# To do
-
-- Start work on typeahead searching
-
-# Notes from simple
-
-- Break down steps
-  - Searchbar
-  - URL params
-  - Craft request body
-  - Figure out shape of responses (use type generator script)
-  - Add results to page
-  - Add Pagination (and page limit)
-- Pagination walkthru
-- Multi obj type
-  - handling keys in typescript of diff obj types
-  - can't programmatically refer to the id or title of a given object type (so must add that manually to the type def)
-
 # Search Demo
 
 This project demonstrates how to let users search object types in Foundry's ontology from a third-party app that uses Foundry's APIs. There are three examples:
@@ -42,11 +24,11 @@ ONTOLOGYRID=<your ontology rid>
 Then, run the development server:
 
 ```bash
+pnpm dev
+# or
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
