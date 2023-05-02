@@ -32,3 +32,8 @@ yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Complaints Data
+You can download the US NHTSA Complaints data used in this repo here (File > Save As):
+- [Excel](https://ontologize-my.sharepoint.com/:x:/p/taylor/EdDiV20D4LVGlLskoQbYD6MBn-GQwfOjdSdyahwHLJ_PvA?rtime=eMNFOSdL20g) ~90MB
+- [CSV](https://ontologize-my.sharepoint.com/:u:/p/taylor/EZHvdgxoihZBhvhZdKxCbt8BJ_6l3b62lgISQ2HzjBMwjg?e=cretGf) ~40MB zipped and ~210MB unzipped
